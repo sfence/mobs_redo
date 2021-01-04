@@ -1848,6 +1848,19 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 	end
 end
 
+-- peaceful player privilege support
+local function is_peaceful_player(player)
+  if (peaceful_player_enabled) then -- if peaceful player is allowed by configuration
+    local player_name = player:get_player_name();
+    if (player_name~=nil) then
+      if (minetest.check_player_privs(player_name, "peaceful_player")) then
+        return true;
+      end
+    end
+  end
+  
+  return false;
+end
 
 -- general attack function for all mobs
 function mob_class:general_attack()
@@ -1921,7 +1934,8 @@ function mob_class:general_attack()
 		-- choose closest player to attack that isnt self
 		if dist ~= 0
 		and dist < min_dist
-		and self:line_of_sight(sp, p, 2) == true then
+		and self:line_of_sight(sp, p, 2) == true 
+    and (not is_peaceful_player(player)) then
 			min_dist = dist
 			min_player = player
 		end
@@ -1929,15 +1943,6 @@ function mob_class:general_attack()
 
 	-- attack closest player or mob
 	if min_player and random(100) > self.attack_chance then
-    -- peaceful player privilege support
-    if (peaceful_player_enabled) then -- if peaceful player is allowed by configuration
-      local player_name = min_player:get_player_name();
-      if (player_name~=nil) then
-        if (minetest.check_player_privs(player_name, "peaceful_player")) then
-          return
-        end
-      end
-    end
 		self:do_attack(min_player)
 	end
 end
