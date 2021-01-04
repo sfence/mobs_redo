@@ -65,6 +65,7 @@ local max_per_block = tonumber(settings:get("max_objects_per_block") or 99)
 local mob_nospawn_range = tonumber(settings:get("mob_nospawn_range") or 12)
 local active_limit = tonumber(settings:get("mob_active_limit") or 0)
 local mob_chance_multiplier = tonumber(settings:get("mob_chance_multiplier") or 1)
+local peaceful_player_enabled = settings:get_bool("enable_peaceful_player")
 local active_mobs = 0
 
 
@@ -1928,6 +1929,15 @@ function mob_class:general_attack()
 
 	-- attack closest player or mob
 	if min_player and random(100) > self.attack_chance then
+    -- peaceful player privilege support
+    if (peaceful_player_enabled) then -- if peaceful player is allowed by configuration
+      local player_name = min_player:get_player_name();
+      if (player_name~=nil) then
+        if (minetest.check_player_privs(player_name, "peaceful_player")) then
+          return
+        end
+      end
+    end
 		self:do_attack(min_player)
 	end
 end

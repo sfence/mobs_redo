@@ -1,6 +1,9 @@
 
 local path = minetest.get_modpath("mobs")
 
+-- Peaceful player privilege
+minetest.register_privilege("peaceful_player", { description = "prevents mobs drived by mobs_redo api from attacking player", give_to_singleplayer = false});
+
 -- Mob API
 dofile(path .. "/api.lua")
 
